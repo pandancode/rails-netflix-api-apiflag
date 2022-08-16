@@ -1,4 +1,5 @@
 Rails.application.routes.draw do
+  root to: "pages#home"
   get 'reviews/index'
   get 'reviews/create'
   get 'reviews/update'
@@ -11,7 +12,6 @@ Rails.application.routes.draw do
   get 'watchlists/update'
   get 'watchlists/delete'
   resources :movies
-  root to: "pages#home"
 
   namespace :api do
     namespace :v1 do
