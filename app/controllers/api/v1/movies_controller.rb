@@ -1,6 +1,7 @@
 class Api::V1::MoviesController < ActionController::API
   include RackSessionFix
   # before_action :authenticate_user!
+  before_action :authenticate_user!
   p "Hello from movies controller"
 
   def index
@@ -12,7 +13,7 @@ class Api::V1::MoviesController < ActionController::API
     render json: Movie.all
   end
 
-  private
+  # private
 
   # def get_user_from_token
   #   p "Hello from get_user_from_token"

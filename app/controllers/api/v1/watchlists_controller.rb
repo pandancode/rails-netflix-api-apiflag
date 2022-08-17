@@ -1,6 +1,6 @@
 class Api::V1::WatchlistsController < ActionController::API
   include RackSessionFix
-  # before_action :authenticate_user!
+  before_action :authenticate_user!
   p "Hello from watchlists controller"
 
   # ! WHENEVER SOMETHING HAPPEN HERE, WE ALREADY KNOW THE USER + MOVIE.
