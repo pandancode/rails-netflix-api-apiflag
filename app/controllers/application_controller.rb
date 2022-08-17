@@ -4,9 +4,7 @@ class ApplicationController < ActionController::API
   respond_to :json
 
   # include ActionController::HttpAuthentication::Token::ControllerMethods
-  # before_action :authenticate_user_from_token!
   # before_action :authenticate_user!
-  p "Hello from application_controller"
 
   # private
 

@@ -23,7 +23,7 @@ class API::V1::ReviewsController < ActionController::API
     # ! review.update()
   end
 
-  def delete
+  def destroy
     review = Review.find(params["review_id"])
 
     if review.delete
