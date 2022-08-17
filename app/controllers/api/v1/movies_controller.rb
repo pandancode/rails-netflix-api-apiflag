@@ -1,8 +1,6 @@
 class Api::V1::MoviesController < ActionController::API
   include RackSessionFix
-  # before_action :authenticate_user!
   before_action :authenticate_user!
-  p "Hello from movies controller"
 
   def index
     render json: Movie.all
