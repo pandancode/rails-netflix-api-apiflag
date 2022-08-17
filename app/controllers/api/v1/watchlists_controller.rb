@@ -1,5 +1,7 @@
 class Api::V1::WatchlistsController < ActionController::API
+  include RackSessionFix
   before_action :authenticate_user!
+
   # ! WHENEVER SOMETHING HAPPEN HERE, WE ALREADY KNOW THE USER + MOVIE.
   # ! WE'RE JUST MISSING THE NAME OF THE WATCHLIST
   # ! WE OPEN A FORM WHEN CLICKING ON CLOCK ICON + GATHER INFORMATION (NEW OR EXISTING LIST)

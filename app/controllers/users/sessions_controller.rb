@@ -7,8 +7,6 @@ class Users::SessionsController < Devise::SessionsController
 
   def respond_with(resource, _opts = {})
     render json: { message: 'You are logged in.', user: current_user }, status: :ok
-    # ! @Yilun to come back to this
-    # render json: { message: 'You are logged in.', user: current_user, token: current_token }, status: :ok
   end
 
   def respond_to_on_destroy

@@ -1,5 +1,7 @@
 class API::V1::ReviewsController < ActionController::API
-  before_action :authenticate_user!
+  include RackSessionFix
+  # before_action :authenticate_user!
+
   def index
     reviews = Review.where(watchlist_id: params["watchlist_id"])
 
@@ -21,7 +23,7 @@ class API::V1::ReviewsController < ActionController::API
     # ! review.update()
   end
 
-  def delete
+  def destroy
     review = Review.find(params["review_id"])
 
     if review.delete

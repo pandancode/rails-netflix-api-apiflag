@@ -1,5 +1,6 @@
 class Api::V1::FavoritesController < ActionController::API
   require 'json'
+  include RackSessionFix
   before_action :authenticate_user!
 
   def index
