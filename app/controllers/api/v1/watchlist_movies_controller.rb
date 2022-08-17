@@ -1,5 +1,6 @@
 class Api::V1::WatchlistMoviesController < ActionController::API
-  before_action :authenticate_user!
+  include RackSessionFix
+  # before_action :authenticate_user!
 
   def create
   end

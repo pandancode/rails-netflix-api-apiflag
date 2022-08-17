@@ -1,6 +1,8 @@
 class Api::V1::FavoritesController < ActionController::API
   require 'json'
-  before_action :authenticate_user!
+  include RackSessionFix
+  # before_action :authenticate_user!
+  p "Hello from favorites controller"
 
   def index
     favorite_list = current_user.movies
