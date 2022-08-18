@@ -3,7 +3,8 @@ class CreateReviews < ActiveRecord::Migration[7.0]
     create_table :reviews do |t|
       t.text :comment
       t.string :username
-      t.integer :like_counter, default: 0
+      t.integer :likes, default: 0
+      t.integer :dislikes, default: 0
       t.references :user, null: false, foreign_key: true
       t.references :watchlist, null: false, foreign_key: true
 

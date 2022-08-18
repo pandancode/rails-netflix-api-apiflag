@@ -14,10 +14,9 @@ class Api::V1::WatchlistsController < ActionController::API
 
   def show
     watchlist = Watchlist.find(params["id"])
-    watchlist_reviews = watchlist.reviews
+    watchlist_reviews = watchlist.reviews.order(id: :desc)
     watchlist_movies = watchlist.movies
     creator = watchlist.user.username
-    reviews = watchlist.reviews
 
     if watchlist
       render json: { message: "Here's more information for the watchlist with id #{params["watchlist_id"]}", watchlist: watchlist.to_json, reviews: watchlist_reviews.to_json, movies: watchlist_movies.to_json, watchlist_creator: creator.to_json }, status: :ok
