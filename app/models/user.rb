@@ -11,4 +11,5 @@ class User < ApplicationRecord
   has_many :movies, through: :favorites
   has_many :watchlists
   has_many :reviews
+  has_many :review_likes
 end
