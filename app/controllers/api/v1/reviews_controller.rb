@@ -36,7 +36,7 @@ class Api::V1::ReviewsController < ActionController::API
     # ? WHAT'S NEEDED HERE: review_id (In URL) / action_type (in body) / user = current_user (session token)
     review = Review.find(params["id"])
     reviewLike = ReviewLike.where(user_id: current_user.id, review_id: review.id)
-      review_likes_counter = review.likes_counter
+    review_likes_counter = review.likes_counter
 
     if params["action_type"] == "liked"
       review.update(likes_counter: review_likes_counter += 1)
@@ -50,15 +50,13 @@ class Api::V1::ReviewsController < ActionController::API
       else
         review.update(dislikes_counter: review.dislikes_counter -= 1)
         reviewLike[0].update(action_type: "liked")
-        render json: { message: "You successfully changed your mind and liked the review with id #{review.id}", review: review.to_json, review_like: reviewLike.to_json }, status: :ok
+        render json: { message: "You successfully changed your mind and liked the review with id #{review.id}", review: review.to_json, review_like: reviewLike[0].to_json }, status: :ok
       end
 
     elsif params["action_type"] == "unliked"
       review.update(likes_counter: review_likes_counter -= 1)
-      review_like_id = reviewLike.first.id
       reviewLike.first.delete
-
-      render json: { message: "You successfully unliked the review with id #{review.id}", review: review.to_json, review_like_id: review_like_id.to_json }, status: :ok
+      render json: { message: "You successfully unliked the review with id #{review.id}", review: review.to_json, review_like: reviewLike.first.to_json }, status: :ok
     else
       render json: {message: "An error occured while liking/unliking the review with id #{review.id}" }
     end
@@ -69,7 +67,7 @@ class Api::V1::ReviewsController < ActionController::API
 
     review = Review.find(params["id"])
     reviewLike = ReviewLike.where(user_id: current_user.id, review_id: review.id)
-      review_dislikes_counter = review.dislikes_counter
+    review_dislikes_counter = review.dislikes_counter
 
     if params["action_type"] == "disliked"
       review.update(dislikes_counter: review_dislikes_counter += 1)
@@ -83,15 +81,14 @@ class Api::V1::ReviewsController < ActionController::API
       else
         review.update(likes_counter: review.likes_counter -= 1)
         reviewLike[0].update(action_type: "disliked")
-        render json: { message: "You successfully changed your mind and disliked the review with id #{review.id}", review: review.to_json, review_like: reviewLike.to_json }, status: :ok
+        render json: { message: "You successfully changed your mind and disliked the review with id #{review.id}", review: review.to_json, review_like: reviewLike[0].to_json }, status: :ok
       end
 
     elsif params["action_type"] == "undisliked"
       review.update(dislikes_counter: review_dislikes_counter -= 1)
-      review_like_id = reviewLike.first.id
       reviewLike.first.delete
-
-      render json: { message: "You successfully undisliked the review with id #{review.id}", review: review.to_json, review_like_id: review_like_id.to_json }, status: :ok
+      p reviewLike.first
+      render json: { message: "You successfully undisliked the review with id #{review.id}", review: review.to_json, review_like: reviewLike.first.to_json }, status: :ok
     else
       render json: {message: "An error occured while liking/unliking the review with id #{review.id}" }
     end
