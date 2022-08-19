@@ -22,6 +22,9 @@ class Api::V1::ReviewsController < ActionController::API
   def update
     review = Review.find(params["id"])
 
+    prev_like_counter = review.likes
+    new_like_counter
+
     if review.update(review_permited_params)
       render json: { message: "Your review with id #{params["id"]} has been updated successfully", review: review.to_json}, status: :ok
     else
