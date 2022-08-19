@@ -25,7 +25,12 @@ Rails.application.routes.draw do
       resources :movies, only: [ :index ]
       resources :favorites, only: [ :index, :create, :destroy ]
       resources :watchlists
-      resources :reviews, only: [ :index, :create, :update, :destroy ]
+      resources :reviews, only: [ :index, :create, :update, :destroy ] do
+        member do
+          patch "update_review_likes", to: "reviews#update_review_likes"
+          patch "update_review_dislikes", to: "reviews#update_review_dislikes"
+        end
+      end
     end
   end
   # Define your application routes per the DSL in https://guides.rubyonrails.org/routing.html

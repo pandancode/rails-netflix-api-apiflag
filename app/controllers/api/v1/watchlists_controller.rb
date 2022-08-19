@@ -17,9 +17,11 @@ class Api::V1::WatchlistsController < ActionController::API
     watchlist_reviews = watchlist.reviews.order(id: :desc)
     watchlist_movies = watchlist.movies
     creator = watchlist.user.username
+    reviews_liked = current_user.review_likes.where(action_type: "liked")
+    reviews_disliked = current_user.review_likes.where(action_type: "disliked")
 
     if watchlist
-      render json: { message: "Here's more information for the watchlist with id #{params["watchlist_id"]}", watchlist: watchlist.to_json, reviews: watchlist_reviews.to_json, movies: watchlist_movies.to_json, watchlist_creator: creator.to_json }, status: :ok
+      render json: { message: "Here's more information for the watchlist with id #{params["watchlist_id"]}", watchlist: watchlist.to_json, reviews: watchlist_reviews.to_json, movies: watchlist_movies.to_json, watchlist_creator: creator.to_json, reviews_liked: reviews_liked.to_json, reviews_disliked: reviews_disliked.to_json }, status: :ok
     else
       render json: { message: "Couldn't find watchlist with id #{params["watchlist_id"]}"}, status: :unprocessable_entity
     end
