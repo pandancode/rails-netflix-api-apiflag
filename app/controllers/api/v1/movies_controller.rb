@@ -2,6 +2,8 @@ class Api::V1::MoviesController < ActionController::API
   include RackSessionFix
   before_action :authenticate_user!
 
+  # * RETURNS ALL THE MOVIES.
+  # TODO --> ADD A MESSAGE AND A STATUS.
   def index
     render json: Movie.all
   end

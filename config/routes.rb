@@ -24,7 +24,7 @@ Rails.application.routes.draw do
     namespace :v1 do
       resources :movies, only: [ :index ]
       resources :favorites, only: [ :index, :create, :destroy ]
-      resources :watchlists
+      resources :watchlists, only: [ :index, :show, :create, :destroy ]
       resources :reviews, only: [ :index, :create, :update, :destroy ] do
         member do
           patch "update_review_likes", to: "reviews#update_review_likes"

@@ -6,12 +6,27 @@ class Api::V1::WatchlistsController < ActionController::API
   # ! WE'RE JUST MISSING THE NAME OF THE WATCHLIST
   # ! WE OPEN A FORM WHEN CLICKING ON CLOCK ICON + GATHER INFORMATION (NEW OR EXISTING LIST)
 
+
+  # * RETURNS AN ARRAY WITH ALL THE WATCHLISTS. EACH INSTANCE HOLDS INFORMATION ABOUT:
+  # *  - WATCHLIST ID
+  # *  - THE ID OF THE USER WHO CREATED THE WATCHLIST
+  # *  - THE USERNAME OF THE USER THAT CREATED THE LIST
+  # *  - THE WATCHLIST NAME
+  # *  - THE LIST OF MOVIES CONTAINED IN THE WATCHLIST (THANKS TO THE "get_watchlist_array_with_name_and_movies" METHOD)
   def index
     watchlists_movies = get_watchlist_array_with_name_and_movies # ? ALL WATCHLISTS (NOT ONLY CURRENT USER)
 
     render json: { message: "Here are all the watchlists ever created", watchlists: watchlists_movies.to_json }, status: :ok
   end
 
+
+  # * RETURNS INFORMATION ABOUT THE SELECTED WATCHLIST:
+  # *  - THE WATCHLIST INSTANCE ITSELF
+  # *  - ALL THE REVIEWS FOR THIS WATCHLIST
+  # *  - ALL THE MOVIES IN THIS WATCHLIST
+  # *  - THE USERNAME OF THE USER THAT CREATED THE WATCHLIST
+  # *  - THE "DISLIKED_COUNT" FOR THIS WATCHLIST
+  # *  - THE "LIKED_COUNT" FOR THIS WATCHLIST
   def show
     watchlist = Watchlist.find(params["id"])
     watchlist_reviews = watchlist.reviews.order(id: :desc)
@@ -27,6 +42,15 @@ class Api::V1::WatchlistsController < ActionController::API
     end
   end
 
+
+  # * WE CHECK IF THE CURRENT USER ALREADY CREATED A WATCHLIST WITH THE NAME IN THE PARAMS
+  # *   - IF NO:
+  # *     - WE CREATE A NEW WATCHLIST FOR THIS USER WITH THE NAME PASSED IN THE PARAMS AND ADD THE SPECIFIED MOVIE IN IT
+  # *   - IF YES:
+  # *     - WE SIMPLY CREATE A NEW ENTRY FOR THIS WATCHLIST IF NONE ALREADY EXIST WITH THE SPECIFIED MOVIE
+  # * RETURNS ALL THE WATCLISTS INCLUDING THE NEWLY CREATED ONE
+  # TODO MAKE SURE WE JUST RETURN THE NEWLY CREATED WATCHLIST AND UPDATE THE WATCHLISTS LIST IN THE REDUX STORE DIRECTLY
+  # TODO (BETTER FOR PERFORMANCE + AVOID USELESS BIG REFRESH)
   def create
     wl_name = params["wl_name"]
     movie_id = params["movie_id"]
@@ -36,12 +60,10 @@ class Api::V1::WatchlistsController < ActionController::API
     watchlist = Watchlist.where(user_id: current_user.id).where(name: wl_name)
 
     if watchlist.empty?
-      # ! If there's no watchlist already existing for this user with this name, we create it
       Watchlist.create(user_id: current_user.id, name: wl_name)
       newly_created_watchlist_id = current_user.watchlists.last.id
       WatchlistMovie.create(watchlist_id: newly_created_watchlist_id, movie_id: movie_id)
     else
-      # ! otherwise we just create a new entry for this watchlist if it doesn't already exists
       already_has_movie = watchlist[0].movies.any? { |movie| movie.id === movie_id }
       if already_has_movie === false
         WatchlistMovie.create(watchlist_id: watchlist[0].id, movie_id: movie_id)
@@ -53,12 +75,22 @@ class Api::V1::WatchlistsController < ActionController::API
     render json: { message: "Here's the updated watchlists for the user #{current_user.email}", watchlists: watchlists_movies.to_json }, status: :ok
   end
 
+
+  # * WE CHECK IF THE WATCHLIST WE'RE TRYING TO DELETE A MOVIE FROM CONTAINS MORE THAN ONE MOVIE
+  # *   - IF YES:
+  # *     - WE MAKE DELETE THE MOVIE INSTANCE FROM THE WATCHLIST
+  # *     - RETURNS ALL THE WATCHLISTS FOR THE USER (UPDATED)
+  # TODO  - RETURN THE UPDATED WATCHLIST INSTEAD OF ALL THE WATCHLISTS (MEMORY INTENSIVE AND FORCE GLOBAL RELOAD ON CLIENT SIDE, WHICH IS NOT GOOD)
+  # *   - IF NO:
+  # *     - WE DELETE THE WHOLE WATCHLIST (INCLUDING THE SINGLE MOVIE INSIDE OF IT)
+  # *     - RETURNS ALL THE WATCHLISTS FOR THE USER (UPDATED)
+  # TODO  - ONLY RETURN MESSAGE + STATUS AND REMOVE THE WATCHLIST FROM THE "ALL WATCHLIST" ARRAY DIRECTLY IN THE REDUX STORE.
   def destroy
     movie_id = params["id"]
     instance_to_delete = nil
 
    Watchlist.where(user_id: current_user.id).each do |wl|
-    # ? IF WE FIND THE PASSED MOVIE IN ONE THE USER WATCHLISTS, WE'LL DELETE IT
+      # ? IF WE FIND THE PASSED MOVIE IN ONE THE USER WATCHLISTS, WE'LL DELETE IT
       if !wl.watchlist_movies.where(movie_id: movie_id).empty?
         instance_to_delete = wl.watchlist_movies.where(movie_id: movie_id)[0]
       end
@@ -86,6 +118,7 @@ class Api::V1::WatchlistsController < ActionController::API
 
   private
 
+  # ! CREATES A NEW ARRAY INCLUDING ALL THE INSTANCES CONTAINED IN THE PASSED ACTIVERECORD COLELCTION
   def transform_collection_onto_hash(collection) # ? Starts with "#<Movie ... >"
     array_containing_hashes = []
 
@@ -113,6 +146,8 @@ class Api::V1::WatchlistsController < ActionController::API
     array_containing_hashes
   end
 
+  # ! BUILDS AN ARRAY INCLUDING INFRMATIONS ABOUT A WATCHLIST + THE MOVIES ATTACHED TO IT.
+  # ! MAKES IT EASIER EASIER TO HANDLE IN THE CLIENT SIDE.
   def get_watchlist_array_with_name_and_movies
     watchlists_movies = []
 
@@ -121,7 +156,7 @@ class Api::V1::WatchlistsController < ActionController::API
       wl_movies = transform_collection_onto_hash(wl.movies)
       wl_username = wl.user.username
 
-      watchlists_movies.push({id: wl.id, user_id: wl.user.id ,name: wl_name, movies: wl_movies, created_by: wl_username })
+      watchlists_movies.push({id: wl.id, user_id: wl.user.id, name: wl_name, movies: wl_movies, created_by: wl_username })
     end
 
     watchlists_movies
