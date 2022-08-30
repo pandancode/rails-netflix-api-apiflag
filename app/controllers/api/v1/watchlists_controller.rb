@@ -6,7 +6,6 @@ class Api::V1::WatchlistsController < ActionController::API
   # ! WE'RE JUST MISSING THE NAME OF THE WATCHLIST
   # ! WE OPEN A FORM WHEN CLICKING ON CLOCK ICON + GATHER INFORMATION (NEW OR EXISTING LIST)
 
-
   # * RETURNS AN ARRAY WITH ALL THE WATCHLISTS. EACH INSTANCE HOLDS INFORMATION ABOUT:
   # *  - WATCHLIST ID
   # *  - THE ID OF THE USER WHO CREATED THE WATCHLIST
@@ -64,8 +63,8 @@ class Api::V1::WatchlistsController < ActionController::API
       newly_created_watchlist_id = current_user.watchlists.last.id
       WatchlistMovie.create(watchlist_id: newly_created_watchlist_id, movie_id: movie_id)
     else
-      already_has_movie = watchlist[0].movies.any? { |movie| movie.id === movie_id }
-      if already_has_movie === false
+      already_has_movie = watchlist[0].movies.any? { |movie| movie.id == movie_id }
+      if already_has_movie == false
         WatchlistMovie.create(watchlist_id: watchlist[0].id, movie_id: movie_id)
       end
     end
@@ -89,7 +88,7 @@ class Api::V1::WatchlistsController < ActionController::API
     movie_id = params["id"]
     instance_to_delete = nil
 
-   Watchlist.where(user_id: current_user.id).each do |wl|
+    Watchlist.where(user_id: current_user.id).each do |wl|
       # ? IF WE FIND THE PASSED MOVIE IN ONE THE USER WATCHLISTS, WE'LL DELETE IT
       if !wl.watchlist_movies.where(movie_id: movie_id).empty?
         instance_to_delete = wl.watchlist_movies.where(movie_id: movie_id)[0]
